@@ -1,19 +1,26 @@
 Assignment 1 - Hello World: GitHub and d3  
 ===
 
+#### url: https://sugie244.github.io/a1-ghd3/
+
 Description 
 ----
 This program visualizes songs based on their position in the duration (for example, 1 minute 2 seconds into a 3 min song) and the dominate frequency of the high-end portion
-of the audio (vocals, first 139 bits from FFT of 2048). The color of the generated circles will also differ based
+of the audio (vocals). The color of the generated circles will also differ based
 on the vocal index. The radius of the circles are generated based on the 
-dominate frequency of the lower-end portion of the audio (bass). Unfortunately, while
+bass volume at that point. Unfortunately, while
 your own music cannot be uploaded, I have provided a couple of songs to use as a reference.
 If you do not like the color scheme chosen for the visualization, you can change it at any 
-point of the song by editing it in the drop down menu. 
+point of the song by editing it in the dropdown menu. 
 
-Github Pages url
----
-https://sugie244.github.io/a1-ghd3/
+Below are two examples of the visualizations made:
+
+Eternally by TXT, using cool interpolation
+![eternally](Screenshot%202026-10-26%20at%206.48.52 PM.png)
+
+I'M A BLACKHOLE (STAR) - Odetari, using Turbo interpolation
+![star](Screenshot 2026-10-26 at 6.52.49 PM.png)
+
 
 Technical and Design Achievements
 ---
