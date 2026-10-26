@@ -95,6 +95,14 @@
             .attr('x2', 435)
             .attr('y2', 75)
             .attr('stroke', 'white')
+            .attr('stroke-width', '16px');
+
+    const line1Core = pauseButtonContainer.append('line')
+            .attr('x1', 435)
+            .attr('y1', 30)
+            .attr('x2', 435)
+            .attr('y2', 70)
+            .attr('stroke', '#e7ddff')
             .attr('stroke-width', '10px');
 
     const line2 = pauseButtonContainer.append('line')
@@ -103,6 +111,15 @@
             .attr('x2', 465)
             .attr('y2', 75)
             .attr('stroke', 'white')
+            .attr('stroke-width', '16px');
+
+
+    const line2Core = pauseButtonContainer.append('line')
+            .attr('x1', 465)
+            .attr('y1', 30)
+            .attr('x2', 465)
+            .attr('y2', 70)
+            .attr('stroke', '#e7ddff')
             .attr('stroke-width', '10px');
 
     // Add Polygons
@@ -110,7 +127,7 @@
 
     const polygon = playButtonContainer.append("polygon")
             .attr("points", pointsData.map(d => d.join(",")).join(" "))
-            .style("fill", "white")
+            .style("fill", "lightpink")
             .style("stroke", "white")
             .style("stroke-width", "2px");
 
