@@ -7,7 +7,25 @@
 <body>
   <div id="container"></div>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <p>hello</p>
+  <style>
+    body {
+      background-color: lightblue;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    svg {
+      display: block;
+      margin: 15px auto;
+    }
+  </style>
 
   <p>Audio Analyzer</p>
   <div>
@@ -30,35 +48,92 @@
       <audio id="music" src="Aespa%20-%20Black%20Mamba%20(Lyrics).mp3" ></audio>
 
 
-      <button id="playButton">Play Music & Start Art</button>
     </div>
   </div>
 
   <script>
+
     console.log("d3 version", d3.version); // test that d3 loaded
+
+    // Add an SVG
+    const svg2 = d3.select('body').append('svg')
+            .attr('width', '1000')
+            .attr('height', '100')
+            .style("outline", "2px black");
+
+    // Add Rectangles
+    const rectangle = svg2.append('rect')
+            .attr('x', '0')
+            .attr('y', '0')
+            .attr('width', 1000)
+            .attr('height', 100)
+            .attr('fill', 'white');
+
+    const pauseButtonContainer = svg2.append('g')
+            .style('cursor', 'pointer');
+
+    const playButtonContainer = svg2.append('g')
+            .style('cursor', 'pointer');
+
+    // Add Circles
+    const circle = playButtonContainer.append('circle')
+            .attr('cx', 550)
+            .attr('cy', '50')
+            .attr('r', '40')
+            .style('fill', 'lightblue');
+
+    const circle2 = pauseButtonContainer.append('circle')
+            .attr('cx', 450)
+            .attr('cy', '50')
+            .attr('r', '40')
+            .style('fill', 'lightblue');
+
+    // Add Lines
+    const line = pauseButtonContainer.append('line')
+            .attr('x1', 435)
+            .attr('y1', 25)
+            .attr('x2', 435)
+            .attr('y2', 75)
+            .attr('stroke', 'white')
+            .attr('stroke-width', '10px');
+
+    const line2 = pauseButtonContainer.append('line')
+            .attr('x1', 465)
+            .attr('y1', 25)
+            .attr('x2', 465)
+            .attr('y2', 75)
+            .attr('stroke', 'white')
+            .attr('stroke-width', '10px');
+
+    // Add Polygons
+    const pointsData = [[540 , 25], [570, 50], [540, 75]];
+
+    const polygon = playButtonContainer.append("polygon")
+            .attr("points", pointsData.map(d => d.join(",")).join(" "))
+            .style("fill", "white")
+            .style("stroke", "white")
+            .style("stroke-width", "2px");
 
     const svg = d3.select('body').append('svg')
             .attr('width', '1000')
             .attr('height', '500')
-            .style("outline", "2px dashed red");
+            .style("background-color", "white");
 
-    const playButton = document.getElementById('playButton');
+    // const playButton = document.getElementById('playButton');
     const audioPlayer = document.getElementById('music');
 
-    playButton.addEventListener('click', () => {
+    playButtonContainer.on('click', () => {
 
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
 
-      if (audioPlayer.paused) {
-        audioPlayer.play();
-        playButton.textContent = "Pause Music";
-      } else {
-        audioPlayer.pause();
-        playButton.textContent = "Play Music & Start Art";
-      }
+      audioPlayer.play()
     });
+
+    pauseButtonContainer.on('click', () => {
+      audioPlayer.pause();
+    })
 
 
     // in order to analyze audio, used AnalyserNode
@@ -134,7 +209,7 @@
       audioPlayer.src = event.target.value;
       audioPlayer.load();
 
-      playButton.textContent = "Play Music & Start Art";
+      // playButton.textContent = "Play Music & Start Art";
 
       console.log(audioPlayer.src);
 
@@ -158,47 +233,6 @@
     })
 
 
-    // Add an SVG
-    const svg2 = d3.select('body').append('svg')
-            .attr('width', '1000')
-            .attr('height', '500')
-            .style("outline", "2px dashed red");
-
-
-
-    // Add Rectangles
-    const rectangle = svg2.append('rect')
-            .attr('x', 10)
-            .attr('y', 120)
-            .attr('width', 650)
-            .attr('height', 40)
-            .attr('stroke', 'black')
-            .attr('fill', 'red');
-    // Add Circles
-
-    const circle = svg2.append('circle')
-            .attr('cx', '50%')
-            .attr('cy', '50%')
-            .attr('r', '20')
-            .style('fill', 'purple');
-
-
-    // Add Lines
-    const line = svg2.append('line')
-            .attr('x1', 20)
-            .attr('y1', 10)
-            .attr('x2', 800)
-            .attr('y2', 50)
-            .attr('stroke', 'purple')
-
-    // Add Polygons
-    const pointsData = [[600, 0], [0, 100], [300, 100]];
-
-    const polygon = svg2.append("polygon")
-            .attr("points", pointsData.map(d => d.join(",")).join(" "))
-            .style("fill", "green")
-            .style("stroke", "black")
-            .style("stroke-width", "2px");
 
 
   </script>
