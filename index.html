@@ -165,7 +165,7 @@
 
     // in order to analyze audio, used AnalyserNode
 
-    // create AnalyserNode
+    // create AnalyserNode. part of this code were taken from examples in documentation
     const audioCtx = new AudioContext();
     const analyzer = audioCtx.createAnalyser();
 
@@ -180,7 +180,7 @@
     const dataArray = new Uint8Array(bufferLength);
 
 
-    // AI was used to help with scaling both the color and y axis to match song
+    // AI was used to help with scaling both the color and y axis to match song. i did the xscale though
     const yScale = d3.scaleLinear().domain([0, 700]).range([450, 50]); // reminder to self: domain and range is not x and y. domain is input (data we're giving it) range is how pixels should be outputted
     const xScale = d3.scaleLinear().domain([0, 500]).range([75, 950]);
     let colorScale = d3.scaleSequential(d3.interpolateCool).domain([0, 500]);
@@ -198,7 +198,7 @@
             .attr("x", -200)
             .attr("fill", "lightblue")
             .style("font-size", "14px")
-            .text("Dominate Frequency (Low-end)"); // largest number from 139 bins
+            .text("Dominate Frequency (High-end)"); // largest number from 139-1024 bins
 
     axisGroup.selectAll("path, line")
             .attr("stroke", "lightblue");

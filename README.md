@@ -16,10 +16,10 @@ point of the song by editing it in the dropdown menu.
 Below are two examples of the visualizations made:
 
 Eternally by TXT, using cool interpolation
-![eternally](Screenshot%202026-10-26%20at%206.48.52 PM.png)
+![eternally](eternally.png)
 
 I'M A BLACKHOLE (STAR) - Odetari, using Turbo interpolation
-![star](Screenshot 2026-10-26 at 6.52.49 PM.png)
+![star](Screenshot 2026-10-26 at 7.14.51 PM.png)
 
 
 Technical and Design Achievements
