@@ -8,6 +8,7 @@
   <div id="container"></div>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <style>
+    /*ai used for code to center the body*/
     body {
       background-color: lightblue;
       color: white;
@@ -27,25 +28,34 @@
     }
   </style>
 
-  <p>Audio Analyzer</p>
+  <h1>Audio Analyzer</h1>
   <div>
     <div class="container">
       <div class="audio-container"></div>
 
-      <label for="songDropdown">Choose a Track: </label>
+      <label for="songDropdown" style='font-weight: bold'>Choose a Track: </label>
       <select id="songDropdown">
+        <option value="TXT - ETERNALLY.mp3">Eternally - TXT</option>
         <option value="Aespa%20-%20Black%20Mamba%20(Lyrics).mp3">Black Mamba - aespa</option>
-        <option value="SSxCH_song.mp3">What's in Your Head? - Summer Soul (EXPLICIT)</option>
+        <option value="SSxCH_song.mp3">What's in Your Head? - Summer Soul (explicit)</option>
         <option value="82MAJOR - Need That Bass.mp3">Need That Bass - 82MAJOR</option>
         <option value="P1HARMONY - SIREN.mp3">SIREN - P1HARMONY</option>
-        <option value="Odetari - I'M A BLACKHOLE (STAR).mp3">I'M A BLACKHOLE (STAR) - Odetari</option>
-        <option value="TXT - ETERNALLY.mp3">Eternally - TXT</option>
+        <option value="Odetari - I'M A BLACKHOLE (STAR).mp3">I'M A BLACKHOLE (STAR) - Odetari (explicit)</option>
         <option value="League Of Legends - FIRESTARTER (feat. MIYEON, SOYEON & Sophie Powers).mp3"> FIRESTARTER - K/DA</option>
         <option value="Through the Night - IU Lyrics [Han,Rom,Eng].mp3">Through the Night - IU</option>
       </select>
 
+      <label for="colorChoice" style="font-weight: bold">Colors: </label>
+      <select id="colorChoice">
+        <option value="interpolateCool">Cool</option>
+        <option value="interpolateTurbo">Turbo</option>
+        <option value="interpolateWarm">Warm</option>
+        <option value="interpolatePlasma">Plasma</option>
+        <option value="interpolateViridis">Viridis</option>
+      </select>
 
-      <audio id="music" src="Aespa%20-%20Black%20Mamba%20(Lyrics).mp3" ></audio>
+
+      <audio id="music" src="TXT - ETERNALLY.mp3" ></audio>
 
 
     </div>
@@ -171,17 +181,38 @@
 
 
     // AI was used to help with scaling both the color and y axis to match song
-    const yScale = d3.scaleLinear().domain([0, 500]).range([450, 50]); // reminder to self: domain and range is not x and y. domain is input (data we're giving it) range is how pixels should be outputted
-    const colorScale = d3.scaleSequential(d3.interpolateCool).domain([0, 200]);
+    const yScale = d3.scaleLinear().domain([0, 700]).range([450, 50]); // reminder to self: domain and range is not x and y. domain is input (data we're giving it) range is how pixels should be outputted
+    const xScale = d3.scaleLinear().domain([0, 500]).range([75, 950]);
+    let colorScale = d3.scaleSequential(d3.interpolateCool).domain([0, 500]);
 
+    const yAxis = d3.axisLeft(yScale);
+
+    const axisGroup = svg.append("g")
+            .attr("transform", "translate(75, 0)")
+            .call(yAxis)
+    ;
+
+    axisGroup.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -40)
+            .attr("x", -200)
+            .attr("fill", "lightblue")
+            .style("font-size", "14px")
+            .text("Dominate Frequency (Low-end)"); // largest number from 139 bins
+
+    axisGroup.selectAll("path, line")
+            .attr("stroke", "lightblue");
+
+    axisGroup.selectAll("text")
+            .attr("fill", "lightblue");
 
     function drawCircleSnapshot() {
       analyzer.getByteFrequencyData(dataArray);
 
       /*
-      originally, I just got the dominate pitch and its index from whole frequency data
+      originally, I just got the dominate frequency and its index from whole frequency data
 
-      however, it was pretty stagnant on the y-axis. split into the dominate pitch of low-end (bass) and high-end (vocal)
+      however, it was pretty stagnant on the y-axis. split into the dominate frequency of low-end (bass) and high-end (vocal)
       I took this split directly from this source: (https://blog.addpipe.com/understanding-audio-frequency-analysis-in-javascript-a-guide-to-using-analysernode-and-getbytefrequencydata)
        */
       // bass
@@ -191,29 +222,36 @@
       // vocal
       const vocalData = dataArray.slice(139, 1024);
       const vocalVolume = Math.max(...vocalData);
-      const vocalIndex = vocalData.indexOf(vocalVolume) + 150;
+      const vocalIndex = vocalData.indexOf(vocalVolume) + 139;
 
       const progressPercent = audioPlayer.currentTime / audioPlayer.duration;
 
 
-      const xPos = progressPercent * 1000;
+      const xPos = progressPercent * 500;
 
       svg.append('circle')
-              .attr('cx', xPos)
+              .attr('cx', xScale(xPos))
               .attr('cy', yScale(vocalIndex))
-              .attr('r', 0) // start small
+              // .attr('r', 0) // start small
               .attr('fill', (colorScale(vocalIndex)))
               .attr('opacity', 0.7)
-              .attr('stroke', '#ffffff') // outline
-              .attr('stroke-width', 0.5)
-              .transition()
-              .duration(400) // 400 ms to expand to true radius
+              // .attr('stroke', '#ffffff') // outline
+              // .attr('stroke-width', 0.1)
+              // .transition()
+              // .duration(400) // 400 ms to expand to true radius
               .attr('r', bassVolume / 10);
     }
 
 
     const songDropdown = document.getElementById('songDropdown');
 
+
+    const colorDropdown = document.getElementById('colorChoice');
+
+    colorDropdown.addEventListener('change', () => {
+      const interpolator = d3[colorDropdown.value];
+      colorScale = d3.scaleSequential(interpolator).domain([0, 500]);
+    })
 
     // if the song choice changes, replace src
     songDropdown.addEventListener('change', (event) => {
@@ -230,13 +268,13 @@
 
       console.log(audioPlayer.src);
 
-      // wipe all songs from before
+      // wipe all circles from before
       svg.selectAll('circle').remove();
     });
 
     // its circle time
     audioPlayer.addEventListener('play', () => {
-      audioTimer = setInterval(drawCircleSnapshot, 1000);
+      audioTimer = setInterval(drawCircleSnapshot, 100);
     })
 
     // song paused, pause making circles
