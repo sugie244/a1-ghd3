@@ -19,7 +19,7 @@ Eternally by TXT, using cool interpolation
 ![eternally](eternally.png)
 
 I'M A BLACKHOLE (STAR) - Odetari, using Turbo interpolation
-![star](Screenshot 2026-10-26 at 7.14.51 PM.png)
+![star](Screenshot%202026-10-26%20at%207.14.51 PM.png)
 
 
 Technical and Design Achievements
