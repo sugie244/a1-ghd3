@@ -7,13 +7,201 @@
 <body>
   <div id="container"></div>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <p>hello</p>
+
+  <p>Audio Analyzer</p>
+  <div>
+    <div class="container">
+      <div class="audio-container"></div>
+
+      <label for="songDropdown">Choose a Track: </label>
+      <select id="songDropdown">
+        <option value="Aespa%20-%20Black%20Mamba%20(Lyrics).mp3">Black Mamba - aespa</option>
+        <option value="SSxCH_song.mp3">What's in Your Head? - Summer Soul (EXPLICIT)</option>
+        <option value="82MAJOR - Need That Bass.mp3">Need That Bass - 82MAJOR</option>
+        <option value="P1HARMONY - SIREN.mp3">SIREN - P1HARMONY</option>
+        <option value="Odetari - I'M A BLACKHOLE (STAR).mp3">I'M A BLACKHOLE (STAR) - Odetari</option>
+        <option value="TXT - ETERNALLY.mp3">Eternally - TXT</option>
+        <option value="League Of Legends - FIRESTARTER (feat. MIYEON, SOYEON & Sophie Powers).mp3"> FIRESTARTER - K/DA</option>
+        <option value="Through the Night - IU Lyrics [Han,Rom,Eng].mp3">Through the Night - IU</option>
+      </select>
+
+
+      <audio id="music" src="Aespa%20-%20Black%20Mamba%20(Lyrics).mp3" ></audio>
+
+
+      <button id="playButton">Play Music & Start Art</button>
+    </div>
+  </div>
+
   <script>
     console.log("d3 version", d3.version); // test that d3 loaded
+
+    const svg = d3.select('body').append('svg')
+            .attr('width', '1000')
+            .attr('height', '500')
+            .style("outline", "2px dashed red");
+
+    const playButton = document.getElementById('playButton');
+    const audioPlayer = document.getElementById('music');
+
+    playButton.addEventListener('click', () => {
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (audioPlayer.paused) {
+        audioPlayer.play();
+        playButton.textContent = "Pause Music";
+      } else {
+        audioPlayer.pause();
+        playButton.textContent = "Play Music & Start Art";
+      }
+    });
+
+
+    // in order to analyze audio, used AnalyserNode
+
+    // create AnalyserNode
+    const audioCtx = new AudioContext();
+    const analyzer = audioCtx.createAnalyser();
+
+    // connect to audio file
+    const audioElement = document.querySelector('audio');
+    const source = audioCtx.createMediaElementSource(audioElement);
+    source.connect(analyzer);
+    analyzer.connect(audioCtx.destination);
+
+    analyzer.fftSize = 2048;
+    const bufferLength = analyzer.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+
+    // AI was used to help with scaling both the color and y axis to match song
+    const yScale = d3.scaleLinear().domain([0, 500]).range([450, 50]); // reminder to self: domain and range is not x and y. domain is input (data we're giving it) range is how pixels should be outputted
+    const colorScale = d3.scaleSequential(d3.interpolateCool).domain([0, 200]);
+
+
+    function drawCircleSnapshot() {
+      analyzer.getByteFrequencyData(dataArray);
+
+      /*
+      originally, I just got the dominate pitch and its index from whole frequency data
+
+      however, it was pretty stagnant on the y-axis. split into the dominate pitch of low-end (bass) and high-end (vocal)
+      I took this split directly from this source: (https://blog.addpipe.com/understanding-audio-frequency-analysis-in-javascript-a-guide-to-using-analysernode-and-getbytefrequencydata)
+       */
+      // bass
+      const bassData = dataArray.slice(0, 139);
+      const bassVolume = Math.max(...bassData);
+
+      // vocal
+      const vocalData = dataArray.slice(139, 1024);
+      const vocalVolume = Math.max(...vocalData);
+      const vocalIndex = vocalData.indexOf(vocalVolume) + 150;
+
+      const progressPercent = audioPlayer.currentTime / audioPlayer.duration;
+
+
+      const xPos = progressPercent * 1000;
+
+      svg.append('circle')
+              .attr('cx', xPos)
+              .attr('cy', yScale(vocalIndex))
+              .attr('r', 0) // start small
+              .attr('fill', (colorScale(vocalIndex)))
+              .attr('opacity', 0.7)
+              .attr('stroke', '#ffffff') // outline
+              .attr('stroke-width', 0.5)
+              .transition()
+              .duration(400) // 400 ms to expand to true radius
+              .attr('r', bassVolume / 10);
+    }
+
+
+    const songDropdown = document.getElementById('songDropdown');
+
+
+    // if the song choice changes, replace src
+    songDropdown.addEventListener('change', (event) => {
+      // need this line to help with bug (AI produced it) (would not switch song if first song was not already played)
+      if (typeof audioTimer !== 'undefined') {
+        clearInterval(audioTimer);
+      }
+
+      audioPlayer.pause();
+      audioPlayer.src = event.target.value;
+      audioPlayer.load();
+
+      playButton.textContent = "Play Music & Start Art";
+
+      console.log(audioPlayer.src);
+
+      // wipe all songs from before
+      svg.selectAll('circle').remove();
+    });
+
+    // its circle time
+    audioPlayer.addEventListener('play', () => {
+      audioTimer = setInterval(drawCircleSnapshot, 1000);
+    })
+
+    // song paused, pause making circles
+    audioPlayer.addEventListener('pause', () => {
+      clearInterval(audioTimer);
+    })
+
+    // if song ends, dont continue to make circles
+    audioPlayer.addEventListener('ended', () => {
+      clearInterval(audioTimer);
+    })
+
+
     // Add an SVG
+    const svg2 = d3.select('body').append('svg')
+            .attr('width', '1000')
+            .attr('height', '500')
+            .style("outline", "2px dashed red");
+
+
+
     // Add Rectangles
+    const rectangle = svg2.append('rect')
+            .attr('x', 10)
+            .attr('y', 120)
+            .attr('width', 650)
+            .attr('height', 40)
+            .attr('stroke', 'black')
+            .attr('fill', 'red');
     // Add Circles
+
+    const circle = svg2.append('circle')
+            .attr('cx', '50%')
+            .attr('cy', '50%')
+            .attr('r', '20')
+            .style('fill', 'purple');
+
+
     // Add Lines
+    const line = svg2.append('line')
+            .attr('x1', 20)
+            .attr('y1', 10)
+            .attr('x2', 800)
+            .attr('y2', 50)
+            .attr('stroke', 'purple')
+
     // Add Polygons
+    const pointsData = [[600, 0], [0, 100], [300, 100]];
+
+    const polygon = svg2.append("polygon")
+            .attr("points", pointsData.map(d => d.join(",")).join(" "))
+            .style("fill", "green")
+            .style("stroke", "black")
+            .style("stroke-width", "2px");
+
+
   </script>
+
 </body>
 </html>
